@@ -1,0 +1,20 @@
+---
+title: "Financial Inclusion in Africa"
+author: "Molo Muli"
+date: "4/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Data Health and Preparation
+
+Training data contains 23,524 observations and 13 variables. From the total variables, 13 are nominal (including the response column) and 3 numeric. The independent variable is **bank_account** which has observations as yes or no. Part of data wrangling will entail encoding observations of the response variable to match 1 and 0 for yes and no respectively. A quick glimpse on the response column observations indicate a high imbalance with 86 percents of all persons not having a bank account.
+
+No missing values are present in the dataset.
+
+Half of the all respondents are of 35 years of age whereas 75% of all respondents are 49 years and below. Householdwise, the largest household consisted of 21 members given the average number being 4. On both variables, measures of spreadness indicated presence of outliers. Using Tukey's rule of outlier detection, 1.77% of all observations had outliers. For purposes of machine learning modeling outliers were dropped. 
+
+## Descriptive Analysis
+
