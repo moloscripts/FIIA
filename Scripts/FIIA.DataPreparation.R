@@ -72,12 +72,26 @@ ggplot(training.FIIA, aes(x=age_of_respondent, fill=gender_of_respondent)) +
   theme_minimal()
 
 
-# Outlier Detection in both Age and Household  Column
+# Outlier Detection
+AgeOutliers <- boxplot.stats(training.FIIA$age_of_respondent)$out # Outliers start from the age of  84
+sort(AgeOutliers, decreasing = F)
+
+
 ggplot(training.FIIA, aes(x=age_of_respondent)) +
-  geom_boxplot() + 
+  geom_boxplot(outlier.color = "red", outlier.shape = 1) + 
   theme_minimal()
 
-boxplot.stats(training.FIIA$age_of_respondent)$out # Outliers start from the age of  95
+# Box plot with per gender showing outlier values
+ggplot(training.FIIA, aes(x = factor(gender_of_respondent), y = age_of_respondent, fill = factor(gender_of_respondent))) + 
+  geom_boxplot() +
+  stat_summary(
+    aes(label = round(stat(y), 1)),
+    geom = "text", 
+    fun.y = function(y) { o <- boxplot.stats(y)$out; if(length(o) == 0) NA else o },
+    hjust = -1
+  )
+
+
 
 # Household Size
 summary(training.FIIA$household_size)
@@ -94,11 +108,17 @@ ggplot(training.FIIA, aes(x=household_size)) +
 
 boxplot.stats(training.FIIA$household_size)$out
 
+HHSizeOutliers <- boxplot.stats(training.FIIA$household_size)$out 
+sort(HHSizeOutliers, decreasing = F) # Outliers start from the Household size of 10
+
 # Curve out a final DF without outliers
 training.set <- training.FIIA %>%
-  filter(age_of_respondent < 95 & household_size< 10)
+  filter(age_of_respondent < 84 & household_size < 10)
 dim(training.set)  
 dim(training.FIIA)
+
+summary(training.set$age_of_respondent)
+summary(training.set$household_size)
 
 training.set <- training.set %>%
   rename(`Location Type` =location_type,
@@ -110,5 +130,3 @@ training.set <- training.set %>%
          `Education Level` = education_level,
          `Job Type` = job_type,
          `Cellphone Access` =cellphone_access)
-
-

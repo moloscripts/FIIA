@@ -199,13 +199,9 @@ summary {
 <h1>Data Health and Preparation</h1>
 <p>Training data contains 23,524 observations and 13 variables. From the total variables, 13 are nominal (including the response column) and 3 numeric. The independent variable is <strong>bank_account</strong> which has observations as yes or no. Part of data wrangling will entail encoding observations of the response variable to match 1 and 0 for yes and no respectively. A quick glimpse on the response column observations indicate a high imbalance with 86 percents of all persons not having a bank account.</p>
 <p>No missing values are present in the dataset.</p>
-</div>
-<div id="descriptive-statistics" class="section level1">
-<h1>Descriptive Statistics</h1>
-<p>Half of the all respondents are of 35 years of age whereas 75% of all respondents are 49 years and below.</p>
-<div id="univariate-analysis" class="section level2">
-<h2>Univariate Analysis</h2>
-<p>Average age of sampled individuals is 33 years old. Using the inter-quartile range criterion, there</p>
+<p>Half of the all respondents are of 35 years of age whereas 75% of all respondents are 49 years and below. Householdwise, the largest household consisted of 21 members given the average number being 4. On both variables, measures of spreadness indicated presence of outliers. Using Tukey’s rule of outlier detection, 1.77% of all observations had outliers. For purposes of machine learning modeling outliers were dropped.</p>
+<div id="descriptive-analysis" class="section level2">
+<h2>Descriptive Analysis</h2>
 </div>
 </div>
 

@@ -14,7 +14,7 @@ Training data contains 23,524 observations and 13 variables. From the total vari
 
 No missing values are present in the dataset.
 
-Half of the all respondents are of 35 years of age whereas 75% of all respondents are 49 years and below. Householdwise, the largest household consisted of 21 members given the average number being 4. On both variables, measures of spreadness indicated presence of outliers. Using Tukey's rule of outlier detection, 1.77% of all observations had outliers. For purposes of machine learning modeling outliers were dropped. 
+Half of the all respondents are of 35 years of age whereas 75% of all respondents are 49 years and below. Householdwise, the largest household consisted of 21 members given the average number being 4. On both variables, measures of spread indicated presence of outliers. Using Tukey's rule of outlier detection, 2.77% of all observations had outliers. Given their marginal proportion, the outliers were dropped.
 
 ## Descriptive Analysis
 
