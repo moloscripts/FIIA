@@ -92,7 +92,6 @@ ggplot(training.FIIA, aes(x = factor(gender_of_respondent), y = age_of_responden
   )
 
 
-
 # Household Size
 summary(training.FIIA$household_size)
 
@@ -113,7 +112,7 @@ sort(HHSizeOutliers, decreasing = F) # Outliers start from the Household size of
 
 # Curve out a final DF without outliers
 training.set <- training.FIIA %>%
-  filter(age_of_respondent < 84 & household_size < 10)
+  filter(age_of_respondent < 82 & household_size < 10)
 dim(training.set)  
 dim(training.FIIA)
 

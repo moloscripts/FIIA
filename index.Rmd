@@ -2,12 +2,33 @@
 title: "Financial Inclusion in Africa"
 author: "Molo Muli"
 date: "4/8/2021"
-output: html_document
+output: 
+  html_document:
+  css: style.css
+  number_sections: TRUE
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+
+
+```{r R-Scripts, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+# Libraries
+library(easypackages)
+libraries("tidyverse","dlookr","knitr","kableExtra")
+
+## Script Files
+source("Scripts/FIIA.DataPreparation.R", local = knitr::knit_global())
+sys.source("Scripts/Analysis.R", envir = knitr::knit_global())
+```
+# Research question and the data science problem
+* The research question is anchored on the main objective of this project which is create a machine learning model that can predict which individuals are most likely to have or use a bank account. 
+* The data science problem will be a classification problem.
+* My personal objective on this project is how to handle an imbalanced dataset in a classification problem
+
+
 # Data Health and Preparation
 
 Training data contains 23,524 observations and 13 variables. From the total variables, 13 are nominal (including the response column) and 3 numeric. The independent variable is **bank_account** which has observations as yes or no. Part of data wrangling will entail encoding observations of the response variable to match 1 and 0 for yes and no respectively. A quick glimpse on the response column observations indicate a high imbalance with 86 percents of all persons not having a bank account.
@@ -16,5 +37,40 @@ No missing values are present in the dataset.
 
 Half of the all respondents are of 35 years of age whereas 75% of all respondents are 49 years and below. Householdwise, the largest household consisted of 21 members given the average number being 4. On both variables, measures of spread indicated presence of outliers. Using Tukey's rule of outlier detection, 2.77% of all observations had outliers. Given their marginal proportion, the outliers were dropped.
 
-## Descriptive Analysis
+# Data Analysis {.tabset .tabset-fade .tabset-pills}
+
+## Descriptive
+On both the variables, the distribution is light tailed (platykurtic). Outliers, which were marginal in relative to the total sample were removed during the data wrangling process. 
+Age has a high standard deviation indicating that values are spread out around the mean. Standard deviation (σ) as a measure of dispersion, its an indicator of how accurately the mean(μ) represents the sample data.
+
+```{r Numeric Descriptives, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+kbl(numeric.descriptives.training.set, booktabs = T) %>% 
+  # kable_styling(latex_options = "striped") %>%
+  kable_classic(full_width = F, html_font = "Cambria", position = "float_right") %>%
+  footnote(number = "**table 1 : Descritpive statistitcs of age and the household size**")
+```
+Standard Error of the mean (SEM) on the other hand, measures how far the mean of the sample is likely to be from the true population mean. SEM is be inversely proportional to the sample size. As the sample size increases the mean value becomes more representative of the population, hence SEM reduces towards zero.
+
+From *table one*, we can see that the SEM is more close to zero indicating that the mean of the sample close to the mean of the total sample. 
+In deducing any of the coefficients mentioned above, primary assumption is that all observations from the sample are statistically independent.  
+
+```{r Normality Test, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.show="hold", out.width="85%"}
+par(mfrow=c(2,2))
+qqnorm(training.set$Age, main = "Normal Q-Q Plot for Age") 
+qqnorm(training.set$`Household Size`, main = "Normal Q-Q Plot for Household Size") 
+# qqline(training.set$Age, col = "red")
+# qqline(training.set$`Household Size`, col = "red")
+```
+
+## Exploratory
+Before performing EDA I had to group the data. The primary goal of this is to analyse similar variables together in line with the response variable. As a result, at least 70% of the data is demographic and the rest environmental, time frame  and financial based. Below is the are the variables under each category.
+
+* **Demographic** : age, sex, household size, country, marital status, relationship with head, education level and job type.
+* **Environmental**: Location (rural/urban)
+* **Time**: Year 
+* **Financial**: Do you have a bank account & cellphone access. _(assumption here is that a cellphone is used to access financial services)_ 
+
+From the training data, 37% of all observations came from Rwanda and the least country with respondents is Uganda with 8.4%. Given the imbalance of the dataset
+
+
 
