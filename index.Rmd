@@ -37,7 +37,7 @@ No missing values are present in the dataset.
 
 Half of the all respondents are of 35 years of age whereas 75% of all respondents are 49 years and below. Householdwise, the largest household consisted of 21 members given the average number being 4. On both variables, measures of spread indicated presence of outliers. Using Tukey's rule of outlier detection, 2.77% of all observations had outliers. Given their marginal proportion, the outliers were dropped.
 
-# Data Analysis {.tabset .tabset-fade .tabset-pills}
+# Data Analysis {.tabset .tabset-fade}
 
 ## Descriptive
 On both the variables, the distribution is light tailed (platykurtic). Outliers, which were marginal in relative to the total sample were removed during the data wrangling process. 
@@ -63,14 +63,85 @@ qqnorm(training.set$`Household Size`, main = "Normal Q-Q Plot for Household Size
 ```
 
 ## Exploratory
-Before performing EDA I had to group the data. The primary goal of this is to analyse similar variables together in line with the response variable. As a result, at least 70% of the data is demographic and the rest environmental, time frame  and financial based. Below is the are the variables under each category.
+<!-- Before performing EDA I had to group the data. The primary goal of this is to analyse similar variables together in line with the response variable.  -->
 
-* **Demographic** : age, sex, household size, country, marital status, relationship with head, education level and job type.
-* **Environmental**: Location (rural/urban)
-* **Time**: Year 
-* **Financial**: Do you have a bank account & cellphone access. _(assumption here is that a cellphone is used to access financial services)_ 
+<!-- * **Demographic** : age, sex, household size, country, marital status, relationship with head, education level and job type. -->
+<!-- * **Environmental**: Location (rural/urban) -->
+<!-- * **Time**: Year  -->
+<!-- * **Financial**: Do you have a bank account & cellphone access. _(assumption here is that a cellphone is used to access financial services)_  -->
 
-From the training data, 37% of all observations came from Rwanda and the least country with respondents is Uganda with 8.4%. Given the imbalance of the dataset
+<div class = "row">
+<hr>
+
+<div  class = "col-md-6">
+```{r Mean Age of who own a bank account, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.height=6}
+MeanAgeBankAccountPlot
+```
+</div>
+  
+<div class = "col-md-6">
+```{r Bank account holders per gender, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.height=6}
+GenderBA
+````
+</div>
+* Fig I: Mean age of all individuals who both have and don't have a bank account is 38 and 39 respectively.
+
+* Fig II: Almost 90% of all females do not have a bank account
+<hr>
+</div>
+
+<!--Relationship  of the individual to the Head of household-->
+
+<!--Third chart takes the full-->
+<div class = "row">
+<div class = "col-md-12">
+```{r Relationship of the respondent to the HH Head-BA, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.width=12, fig.height=6}
+GenderHHBA
+````
+</div>
+* 72% of all male headed household possess a bank account
+* 9 in 10 females own a bank account where a female is a spouse.
+<hr>
+</div>
+
+
+<!--Fourth chart takes the full-->
+<div class = "row">
+<div class = "col-md-12">
+```{r Relationship of the respondent to the HH Head-NoBA, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.width=12, fig.height=6}
+GenderHHNoBA
+````
+</div>
+* 57 % of male headed households do not have a bank account as compared to female counterparts (43%)
+<hr>
+</div>
+
+<!--Education levels of the individuals with respect to the   of the individual to the Head of household-->
+
+<!--Fifth Chart-->
+<div class = "row">
+<div class = "col-md-12">
+```{r Education Levels -BA, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.width=12, fig.height=6}
+EducationGenderBA
+````
+</div>
+* 56% of females who own a bank account have no formal education as compared to their male counterparts (43.8%).
+<hr>
+</div>
+
+<!--Sixth Chart-->
+<div class = "row">
+<div class = "col-md-12">
+```{r Education Levels-NoBA, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.width=12, fig.height=6}
+EducationGenderNoBA
+````
+</div>
+* 71% of of female respondents who don't own a bank account, don't have a formal education. This is in contrast with 29% of male respondents
+* Finally, regardless of presence or absence of a bank account female respondents account the highest demographic of not undergone formal education.
+<hr>
+</div>
+
+
 
 
 
