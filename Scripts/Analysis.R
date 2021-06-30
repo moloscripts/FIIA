@@ -1,6 +1,7 @@
 # Libraries ####
 library(easypackages)
-libraries("tidyverse","dlookr","pastecs","ggbeeswarm","ggthemes","plotly")
+library(tidyverse)
+libraries("dlookr","pastecs","ggbeeswarm","ggthemes","glmnet")
 theme_set(theme_minimal())
 
 # Descriptive Statistics  ####
@@ -178,7 +179,6 @@ EducationGenderNoBA <- Demographics %>%
   geom_text(aes(label=`Percentage (%)`, fontface="bold"), position = position_dodge(0.9), vjust=2, size=4, color="#393E46") +
   scale_fill_manual("legend", values = PrimaryColors)
 EducationGenderNoBA
-
 
 
 

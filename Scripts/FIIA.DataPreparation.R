@@ -1,6 +1,7 @@
 # Data Prep libraries ####
 library(easypackages)
-libraries("tidyverse","inspectdf","dlookr","lubridate")
+library(tidyverse)
+libraries("inspectdf","dlookr","lubridate")
 
 # Datasets {Global} ####
 raw.training.FIIA <- read.csv("Data/Train_v2.csv", stringsAsFactors = T)
