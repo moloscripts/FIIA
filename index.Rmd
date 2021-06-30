@@ -17,11 +17,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r R-Scripts, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
 # Libraries
 library(easypackages)
-libraries("tidyverse","dlookr","knitr","kableExtra")
+libraries("dlookr","knitr","kableExtra")
 
 ## Script Files
 source("Scripts/FIIA.DataPreparation.R", local = knitr::knit_global())
 sys.source("Scripts/Analysis.R", envir = knitr::knit_global())
+sys.source("Scripts/MachineLearning.R", envir = knitr::knit_global())
 ```
 # Research question and the data science problem
 * The research question is anchored on the main objective of this project which is create a machine learning model that can predict which individuals are most likely to have or use a bank account. 
@@ -37,7 +38,7 @@ No missing values are present in the dataset.
 
 Half of the all respondents are of 35 years of age whereas 75% of all respondents are 49 years and below. Householdwise, the largest household consisted of 21 members given the average number being 4. On both variables, measures of spread indicated presence of outliers. Using Tukey's rule of outlier detection, 2.77% of all observations had outliers. Given their marginal proportion, the outliers were dropped.
 
-# Data Analysis {.tabset .tabset-fade}
+# Data Analysis
 
 ## Descriptive
 On both the variables, the distribution is light tailed (platykurtic). Outliers, which were marginal in relative to the total sample were removed during the data wrangling process. 
@@ -63,13 +64,6 @@ qqnorm(training.set$`Household Size`, main = "Normal Q-Q Plot for Household Size
 ```
 
 ## Exploratory
-<!-- Before performing EDA I had to group the data. The primary goal of this is to analyse similar variables together in line with the response variable.  -->
-
-<!-- * **Demographic** : age, sex, household size, country, marital status, relationship with head, education level and job type. -->
-<!-- * **Environmental**: Location (rural/urban) -->
-<!-- * **Time**: Year  -->
-<!-- * **Financial**: Do you have a bank account & cellphone access. _(assumption here is that a cellphone is used to access financial services)_  -->
-
 <div class = "row">
 <hr>
 
@@ -142,6 +136,29 @@ EducationGenderNoBA
 </div>
 
 
+# Machine Learning
+
+## Random Forests
+### Random Forest Classifier
+
+```{r Random Forest Classifier, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# The classifier
+model <- randomForest(formula = BankAccount ~ ., data = training)
+model
+```
+From the model;
+
+* Variables randomly selected at each split are 3.
+* Out of the Bag error - a validation technique used in this model is 11.42%, hence the model has accuracy is 89%. 
+* Finally, below is a plot showing variable importance. Job type is the most important explanatpory variable that determines if an individual will open a bank account or not. Its closely followed by education level of a person and age.
+
+
+```{r Variable importance, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.width=10, fig.height=5}
+varImportancePlot
+```
+
+### Tuning the classifier
+Hyperparameter tuning is usually treated as an optimization problem. Even though random forest is an out of the box algorithm, there are two important parameters that greatly affect the accuracy of the model and hence need tuning. These are `ntrees` and `mtry`. `ntrees` is the number of trees whereas `mtry` denotes the number of random variables selected on each split. 
 
 
 
