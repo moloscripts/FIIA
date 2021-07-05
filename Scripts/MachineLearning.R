@@ -1,16 +1,15 @@
 # Res
 # http://www.feat.engineering/classes-of-feature-selection-methodologies.html. Tree based models don't need feature selection as they're intrinsic
 
+# Libraries ####
 library(easypackages)
-library(tidyverse)
-
-libraries("dlookr","pastecs","randomForest","data.table")
+libraries("dlookr","pastecs","randomForest","data.table","tidyverse","pdp")
 theme_set(theme_minimal())
 
 # Data Prep ####
-set.seed(123)
 
 # Munge the training data 
+set.seed(123)
 training <- training.set %>%
   select(-c("uniqueid","bank_account")) %>%
   rename(Location = `Location Type`, 
@@ -39,9 +38,8 @@ testing <- testing.FIIA %>%
 
 model <- randomForest(formula = BankAccount ~ ., data = training)
 model
-model$confusion
 
-# Variable Importance 
+## Variable Importance Plot  ###
 VariableImportance <- model$importance
 VariableImportance <- as.data.frame(VariableImportance)
 setDT(VariableImportance, keep.rownames = TRUE)[]
@@ -60,3 +58,43 @@ varImportancePlot <- ggplot(VariableImportance, aes(reorder(Variable, MeanDecrea
   coord_flip() +
   theme_minimal()
 varImportancePlot
+
+## Partial Dependence Plots ####
+
+# Job Type
+jobTypePDP <- model %>%  # the %>% operator is read as "and then"
+  partial(pred.var = "job_type") %>%
+  autoplot(smooth = F, ylab = expression(f(job_type)), color="#FFA900", size=4) +
+  theme_light() + 
+  coord_flip()
+jobTypePDP
+
+# Education Level
+EducationLevelPDP <- model %>%  # the %>% operator is read as "and then"
+  partial(pred.var = "education_level") %>%
+  autoplot(smooth = F, ylab = expression(f(education_level)), color="#FFA900", size=4) +
+  theme_light() + 
+  coord_flip()
+EducationLevelPDP
+
+# Age
+AgePDP <- model %>%  # the %>% operator is read as "and then"
+  partial(pred.var = "Age") %>%
+  autoplot(smooth = T, ylab = expression(f(Age)), color="#FFA900") +
+  theme_light() 
+AgePDP
+
+# Hyper Parameter testing ####
+# tuning the mtry
+tune_mtry <- tuneRF(training[,1:11], 
+                    training$BankAccount, 
+                    ntreeTry = 500, 
+                    stepFactor = 2, 
+                    plot = T, 
+                    trace = T, 
+                    # doBest = T,
+                    improve = 0.01)
+# print(tune_mtry)
+
+
+

@@ -143,6 +143,7 @@ EducationGenderNoBA
 
 ```{r Random Forest Classifier, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
 # The classifier
+set.seed(123)
 model <- randomForest(formula = BankAccount ~ ., data = training)
 model
 ```
@@ -150,15 +151,55 @@ From the model;
 
 * Variables randomly selected at each split are 3.
 * Out of the Bag error - a validation technique used in this model is 11.42%, hence the model has accuracy is 89%. 
-* Finally, below is a plot showing variable importance. Job type is the most important explanatpory variable that determines if an individual will open a bank account or not. Its closely followed by education level of a person and age.
-
+* Finally, below is a plot showing variable importance. Job type has the most predictive power. It's closely followed by education level of a person and age.
 
 ```{r Variable importance, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.width=10, fig.height=5}
 varImportancePlot
 ```
 
+### Partial Dependence (DP) Plots {.tabset}
+Partial Dependence plots (PDP) illustrate the relationship between an input variable and the response variable. They show how the predictions partially depend on values of the input. Useful to infer relationships between input variables and the predictor variables in complex non-parametric models.
+
+The relationship can either be causal, (non)linear, monotonic, curvilinear, step function and so on. In our model we'll illustrate PDP using the input that has the most predictive power (job type) and the response variable (presence of a bank account). Below are the PD plots for the 3 important variables against the predictor variable
+
+#### PD plot of job title
+
+```{r PDP  Job Type, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,  fig.width=10, fig.height=5}
+jobTypePDP
+```
+
+#### PD plot of education level
+```{r PDP Environment, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,  fig.width=10, fig.height=5}
+EducationLevelPDP
+```
+
+#### PD plot of age
+```{r PDP Age, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,  fig.width=10, fig.height=5}
+AgePDP
+```
+
+On the nominal observations of input variables under job title(**No formal employment**) and education level(**primary education**) have the highest effect on the response variable. Age on the other hand is inversely proportional. As the age decreases so does the ability of one to open a bank account.
+
 ### Tuning the classifier
-Hyperparameter tuning is usually treated as an optimization problem. Even though random forest is an out of the box algorithm, there are two important parameters that greatly affect the accuracy of the model and hence need tuning. These are `ntrees` and `mtry`. `ntrees` is the number of trees whereas `mtry` denotes the number of random variables selected on each split. 
+Hyperparameter tuning is usually treated as an optimization problem. Even though random forest is an out of the box algorithm, there are three important parameters that affect the accuracy of the model. These are `ntrees`, `mtry` and `sampsize`. `ntrees` is the number of trees in the forest. By default, its usually 500, `mtry` denotes the number of random predictor variables selected on each split and `sampsize` defaults to 63.2% of the training examples. Reason for the explicit proportion is because 63.2% is the expected number of unique observations in a bootstrap sample. Other hyper parameters that affect the performance of a model include: 
 
+* `nodesize` - When the nodesize is small, it allows deeper more complex trees to be grown.
+* `maxnodes` - Together with `ntrees`,  it limits the tree growth to avoid overfitting.
+ 
+```{r tunemtry, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Tuning mtry using out of bag (OOB) error
+tune_mtry <- tuneRF(training[,1:11], 
+                    training$BankAccount, 
+                    ntreeTry = 500, 
+                    stepFactor = 2, 
+                    plot = T, 
+                    trace = T, 
+                    # doBest = T,
+                    improve = 0.01)
+tune_mtry
+```
 
+* `mtry` is 2 because it has the least OOB error. Very marginal with three. 
 
+* Pruning the trees in a random forest model is taken care of. Samples used to train the individual trees are "bootstrapped".
+Given that the random trees have random features, there might be very marginal (if any) correlation between the trees.
