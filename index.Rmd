@@ -1,17 +1,24 @@
 ---
 title: "Financial Inclusion in Africa"
 author: "Molo Muli"
-date: "4/8/2021"
-output: 
+date: "`r Sys.Date()`"
+output:
   html_document:
-  css: style.css
-  number_sections: TRUE
+    toc: true
+    toc_float: true
+    toc_collapsed: false
+    toc_depth: 4
+    smooth_scroll: false
+    number_sections: false
+    highlight: textmate
+    theme: journal
+    includes:
+      after_body: footer.html
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
 
 
 ```{r R-Scripts, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
@@ -24,6 +31,7 @@ source("Scripts/FIIA.DataPreparation.R", local = knitr::knit_global())
 sys.source("Scripts/Analysis.R", envir = knitr::knit_global())
 sys.source("Scripts/MachineLearning.R", envir = knitr::knit_global())
 ```
+
 # Research question and the data science problem
 * The research question is anchored on the main objective of this project which is create a machine learning model that can predict which individuals are most likely to have or use a bank account. 
 * The data science problem will be a classification problem.
@@ -40,7 +48,7 @@ Half of the all respondents are of 35 years of age whereas 75% of all respondent
 
 # Data Analysis
 
-## Descriptive
+## Descriptive {.tabset}
 On both the variables, the distribution is light tailed (platykurtic). Outliers, which were marginal in relative to the total sample were removed during the data wrangling process. 
 Age has a high standard deviation indicating that values are spread out around the mean. Standard deviation (σ) as a measure of dispersion, its an indicator of how accurately the mean(μ) represents the sample data.
 
@@ -55,9 +63,17 @@ Standard Error of the mean (SEM) on the other hand, measures how far the mean of
 From *table one*, we can see that the SEM is more close to zero indicating that the mean of the sample close to the mean of the total sample. 
 In deducing any of the coefficients mentioned above, primary assumption is that all observations from the sample are statistically independent.  
 
-```{r Normality Test, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.show="hold", out.width="85%"}
-par(mfrow=c(2,2))
+### Normal Q-Q Plot for Age
+```{r Q-Q Plot for Age, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.show="hold"}
 qqnorm(training.set$Age, main = "Normal Q-Q Plot for Age") 
+```
+
+
+
+### Normal Q-Q Plot for Household Size
+```{r Q-Q Plot for Household Size, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.show="hold"}
+# par(mfrow=c(2,2))
+# qqnorm(training.set$Age, main = "Normal Q-Q Plot for Age") 
 qqnorm(training.set$`Household Size`, main = "Normal Q-Q Plot for Household Size") 
 # qqline(training.set$Age, col = "red")
 # qqline(training.set$`Household Size`, col = "red")
@@ -138,49 +154,60 @@ EducationGenderNoBA
 
 # Machine Learning
 
-## Random Forests
-### Random Forest Classifier
-
+## Random Forest Classifier
 ```{r Random Forest Classifier, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Split the data into training and validation sets
+set.seed(3456)
+splitting.index <- createDataPartition(training$BankAccount, p=.68,
+                                    list = F, 
+                                    times = 1)
+
+# training and validation set
+training.data <- training[splitting.index,]
+validation.data <- training[-splitting.index,]
+
+
 # The classifier
-set.seed(123)
-model <- randomForest(formula = BankAccount ~ ., data = training)
+model <- randomForest(formula = BankAccount ~ ., data = training.data)
 model
+
+# Print the model output
+print(model)
 ```
 From the model;
 
 * Variables randomly selected at each split are 3.
-* Out of the Bag error - a validation technique used in this model is 11.42%, hence the model has accuracy is 89%. 
+* Out of the Bag error - a validation technique used in this model is 11%, hence the model has accuracy of around 89%. 
 * Finally, below is a plot showing variable importance. Job type has the most predictive power. It's closely followed by education level of a person and age.
 
 ```{r Variable importance, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, fig.width=10, fig.height=5}
 varImportancePlot
 ```
 
-### Partial Dependence (DP) Plots {.tabset}
+## Partial Dependence (DP) Plots {.tabset}
 Partial Dependence plots (PDP) illustrate the relationship between an input variable and the response variable. They show how the predictions partially depend on values of the input. Useful to infer relationships between input variables and the predictor variables in complex non-parametric models.
 
 The relationship can either be causal, (non)linear, monotonic, curvilinear, step function and so on. In our model we'll illustrate PDP using the input that has the most predictive power (job type) and the response variable (presence of a bank account). Below are the PD plots for the 3 important variables against the predictor variable
 
-#### PD plot of job title
+### PD plot of job title
 
 ```{r PDP  Job Type, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,  fig.width=10, fig.height=5}
 jobTypePDP
 ```
 
-#### PD plot of education level
+### PD plot of education level
 ```{r PDP Environment, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,  fig.width=10, fig.height=5}
 EducationLevelPDP
 ```
 
-#### PD plot of age
+### PD plot of age
 ```{r PDP Age, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE,  fig.width=10, fig.height=5}
 AgePDP
 ```
 
 On the nominal observations of input variables under job title(**No formal employment**) and education level(**primary education**) have the highest effect on the response variable. Age on the other hand is inversely proportional. As the age decreases so does the ability of one to open a bank account.
 
-### Tuning the classifier
+## Tuning the classifier
 Hyperparameter tuning is usually treated as an optimization problem. Even though random forest is an out of the box algorithm, there are three important parameters that affect the accuracy of the model. These are `ntrees`, `mtry` and `sampsize`. `ntrees` is the number of trees in the forest. By default, its usually 500, `mtry` denotes the number of random predictor variables selected on each split and `sampsize` defaults to 63.2% of the training examples. Reason for the explicit proportion is because 63.2% is the expected number of unique observations in a bootstrap sample. Other hyper parameters that affect the performance of a model include: 
 
 * `nodesize` - When the nodesize is small, it allows deeper more complex trees to be grown.
@@ -188,18 +215,41 @@ Hyperparameter tuning is usually treated as an optimization problem. Even though
  
 ```{r tunemtry, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
 # Tuning mtry using out of bag (OOB) error
-tune_mtry <- tuneRF(training[,1:11], 
-                    training$BankAccount, 
+tune_mtry <- tuneRF(training.data[,1:11], 
+                    training.data$BankAccount, 
                     ntreeTry = 500, 
                     stepFactor = 2, 
-                    plot = T, 
+                    plot = F, 
                     trace = T, 
-                    # doBest = T,
+                    doBest = T,
                     improve = 0.01)
 tune_mtry
 ```
 
 * `mtry` is 2 because it has the least OOB error. Very marginal with three. 
 
-* Pruning the trees in a random forest model is taken care of. Samples used to train the individual trees are "bootstrapped".
-Given that the random trees have random features, there might be very marginal (if any) correlation between the trees.
+* Pruning the trees in a random forest model is taken care of. The model builds a large collection of de-correlated trees. This removes correlation between the trees 
+
+After hyperparamenter tuning, both the model with 3 and 2 `mtry` give an out of the bag error of 11%. 
+
+## Evaluating the Random Forest Classifier 
+### Confusion Matrix
+```{r ConfusionMatrix, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Predict using validation set
+predict_BA <- predict(object = model, 
+                      newdata = validation.data, 
+                      type = "class")
+
+# Create a confusion matrix 
+cM <- confusionMatrix(data = predict_BA,
+                      reference = validation.data$BankAccount)
+cM
+```
+
+From the matrix, the model was able to predict 6120 as true positives and 361 as true negatives.
+
+* Type one error where the the model predicted that individuals have a bank account but they actually dont was 677. 
+* Type two error where the model predicted that individuals don't have a bank account but they actually have was 361.
+
+
+
